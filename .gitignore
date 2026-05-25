@@ -7,5 +7,4 @@ venv/
 .vscode/
 data/raw/*
 data/processed/*
-*.json
-docs/
+citibike-analysis-fa61.json

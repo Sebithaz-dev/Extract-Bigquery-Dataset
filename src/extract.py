@@ -29,21 +29,11 @@ WHERE
 """
 
 def load_environment():
-    """
-    Carga variables de entorno desde el .env que esta en la raiz del proyecto.
-    En Docker esto se reemplaza por secrets o env vars directamente.
-    """
     env_path = BASE_DIR.parent / ".env"
     load_dotenv(dotenv_path=env_path)
     print(f"[1] Variable de entorno cargada")
 
 def get_bigquery_client():
-    """
-    Crea el cliente de BigQuery usando la var de entorno GOOGLE_APP...
-    Recomendacion Docker/CI/CD:
-    - La variable de entorno debe estar definida en el contenedor.
-    - Evitar hardcodear paths relativos al host; usar mounts de volumen o secrets.
-    """
     try:
         cred_path = Path(os.getenv("GOOGLE_APPLICATION_CREDENTIALS")).resolve()
         if not cred_path:
@@ -61,9 +51,6 @@ def get_bigquery_client():
         print(f"[x] Error creando cliente: {e}")
 
 def run_query(client):
-    """
-    Ejecuta la Query de ejemplo y devuelve un DataFrame
-    """
     try:
         print("[3] Ejecutando consulta en BigQuery")
         return client.query(QUERY).to_dataframe()
@@ -73,11 +60,6 @@ def run_query(client):
         return None
 
 def save_parquet(df):
-    """
-    Guarda el DataFrame como parquet.
-    - Crea los directorios si no existe.
-    - En Docker asegurarnos de montar /app/data/raw para persistencia
-    """
     try:
         OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
         df.to_parquet(OUTPUT_PATH)
@@ -87,9 +69,6 @@ def save_parquet(df):
         print(f"[x] Error guardando archivo: {e}")
 
 def save_parquet_s3(df):
-    """
-    Guarda el DataFrame como parquet dentro de el Bucket S3 (/landing).
-    """
     try:
         s3 = boto3.client('s3')
         params = ['../data/raw/citibike_trips.parquet', 'citibike-datalake-seb', 'landing/citibike_trips.parquet']
